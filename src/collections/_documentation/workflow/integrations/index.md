@@ -19,6 +19,7 @@ These integrations are set up once per organization, and are then usable in all 
 -   [_JIRA Server_]({%- link _documentation/workflow/integrations/global-integrations.md -%}#jira-server)
 -   [_PagerDuty_]({%- link _documentation/workflow/integrations/global-integrations.md -%}#pagerduty)
 -   [_Slack_]({%- link _documentation/workflow/integrations/global-integrations.md -%}#slack)
+-   [_Vercel_]({%- link _documentation/workflow/integrations/global-integrations.md -%}#vercel)
 
 These integrations are maintained and supported by the companies that created them. See [integration platform]({%- link _documentation/workflow/integrations/integration-platform/index.md -%}).
 
