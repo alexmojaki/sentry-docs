@@ -1,54 +1,49 @@
 ---
-title: 'Advanced Data Scrubbing (Beta)'
+title: 'Advanced Data Scrubbing'
 sidebar_order: 4
 keywords: ["pii", "gdpr", "personally identifiable data", "compliance"]
 ---
 
-In addition to using [`beforeSend`]({% link _documentation/data-management/sensitive-data.md %}#custom-event-processing-in-the-sdk) in your SDK or our [server-side data scrubbing features]({% link _documentation/data-management/sensitive-data.md %}#server-side-scrubbing) to redact sensitive data, we are currently beta-testing ways to give you more granular control over server-side data scrubbing of your events. Additional functionality includes:
+In addition to using [`beforeSend`](/data-management/sensitive-data/#custom-event-processing-in-the-sdk) in your SDK or our [regular server-side data scrubbing features](/data-management/sensitive-data/#server-side-scrubbing) to redact sensitive data, Advanced Data Scrubbing is an alternative way to redact sensitive information just before it is saved in Sentry. It allows you to:
 
 * Define custom regular expressions to match on sensitive data
 * Detailed tuning on which parts of an event to scrub
 * Partial removal or hashing of sensitive data instead of deletion
 
-## Overview
-
-**Advanced Data Scrubbing is available only if your organization is enabled as an Early Adopter.** To enable this option, navigate to your organization's settings and enable the "Early Adopter" option. Turning on this option allows access to features prior to full release, and can be disabled at any time.
-
-Early adopters have access to a new option in both organization settings as well as the setting of each project. Go to your project- or organization-settings and click _Data Privacy_ (or _Security
-and Privacy_) in the sidebar. Scrolling down, you will find a new section _Data Privacy Rules_.
-
-Note that everything you configure there will have direct impact on all new events, just as all the other data privacy-related settings do. However, it is not possible to break or undo any other data privacy settings that you may have configured. In other words, it is only possible to accidentally remove too much data, not too little.
-
-If you have any questions related to this feature, feel free to contact us at `markus@sentry.io`.
-
 ## A Basic Example
 
-Go to your project- or organization-settings and click _Data Privacy_ (or _Security and Privacy_) in the sidebar. Scrolling down, you will find a new section _Data Privacy Rules_.
+Go to your project- or organization-settings and click _Security and Privacy_ in the sidebar. Scrolling down, you will find a new section _Advanced Data Scrubbing_.
 
-Click on _Add Rule_. This already adds a very simple rule:
+1. Click on _Add Rule_. You will be presented with a new dialog.
+2. Select _Mask_ as _Method_.
+3. Select _Credit card numbers_ as _Data Type_.
+4. Enter `$string` as _Source_.
 
-```
-[Mask] [credit card numbers] from [    ]
-```
+As soon as you hit _Save_, we will attempt to find all creditcard numbers in your events going forward, and replace them with a series of `******`.
 
-As soon as you hit _Save_, we will attempt to find all creditcard numbers in your events going forward, and replace them with a series of `******`, keeping only the last 4 digits.
+For a more verbose tutorial check out [this blogpost](https://blog.sentry.io/2020/07/02/sentry-data-wash-now-offering-advanced-scrubbing/).
 
 Rules generally consist of three parts:
 
-- A [_Redaction Method_](#redaction-methods): What to do.
-- A [_Rule Type_](#rule-types): What to look for.
-- A [_Selector_](#selectors): Where to look.
+- A [_Method_](#methods): What to do.
+- A [_Data Type_](#data-types): What to look for.
+- A [_Source_](#sources): Where to look.
 
-## Redaction Methods
+## Methods
 
-- _Remove_: Remove the entire field. We may choose to either set it to `null`, remove it entirely or replace it with an empty string depending on technical constraints.
-- _Mask_: Replace all characters with `*`. For creditcards this replaces everything but the last 4 digits.
+- _Remove_: Remove the entire field. We may choose to either set it to `null`, remove it entirely, or replace it with an empty string depending on technical constraints.
+- _Mask_: Replace all characters with `*`.
 - _Hash_: Replace the matched substring with a hashed value.
-- _Replace_: Replace the matched substring with a constant placeholder value such as `[Filtered]` or `[creditcard]`. Right now this value cannot be configured.
+- _Replace_: Replace the matched substring with a constant _placeholder_ value (defaulting to `[Filtered]`).
 
-## Rule Types
+## Data Types
 
-- _Regex Matches_: Custom Perl-style regex (PCRE).
+- _Regex Matches_: Custom regular expression. For example: `[a-zA-Z0-9]+`. Some notes:
+
+  - Do not write `/[a-zA-Z0-9]+/g`, as that will search for a literal `/` and `/g`.
+  - For case-insensitivity, prefix your regex with `(?i)`.
+  - If you're trying to use one of the popular regex "IDEs" like [regex101.com](https://regex101.com/), Golang is usually closest to how Sentry understands your regex.
+
 - _Credit Card Numbers_: Any substrings that look like credit card numbers.
 - _Password Fields_: Any substrings that look like they may contain passwords. Any string that mentions passwords, auth tokens or credentials, any variable that is called `password` or `auth`.
 - _IP Addresses_: Any substrings that look like valid IPv4 or IPv6 addresses.
@@ -60,11 +55,11 @@ Rules generally consist of three parts:
 - _US social security numbers_: 9-digit social security numbers for the USA.
 - _Usernames in filepaths_: For example `myuser` in `/Users/myuser/file.txt`, `C:/Users/myuser/file.txt`, `C:/Documents and Settings/myuser/file.txt`, `/home/myuser/file.txt`, ...
 - _MAC Addresses_
-- _Anything_: Matches any value. This is useful if you want to remove a certain JSON key by path using [_Selectors_](#selectors) regardless of the value.
+- _Anything_: Matches any value. This is useful if you want to remove a certain JSON key by path using [_Sources_](#sources) regardless of the value.
 
 {% capture __alert_content -%}
 
-Sentry does not know if a local variable that looks like a credit card number actually is one. As such, you need to expect not only false-positives but also false-negatives. [_Selectors_](#selectors) can help you in limiting the scope in which your rule runs.
+Sentry does not know if a local variable that looks like a credit card number actually is one. As such, you need to expect not only false-positives but also false-negatives. [_Sources_](#sources) can help you in limiting the scope in which your rule runs.
 
 {%- endcapture -%}
 {%- include components/alert.html
@@ -74,7 +69,7 @@ Sentry does not know if a local variable that looks like a credit card number ac
 %}
 
 
-## Selectors
+## Sources
 
 Selectors allow you to restrict rules to certain parts of the event. This is useful to unconditionally remove certain data by event attribute, and can also be used to conservatively test rules on real data. A few examples:
 
@@ -91,7 +86,13 @@ Selectors allow you to restrict rules to certain parts of the event. This is use
 
 All key names are treated case-insensitively.
 
-### Writing a Selector
+### Using an event ID to auto-complete sources
+
+Above the _Source_ input field you will find another input field for an event ID. Providing a value there allows for better auto-completion of arbitrary _Additional Data_ fields and variable names.
+
+The event ID is purely optional and the value is not saved as part of your settings. Data scrubbing settings always apply to all new events within a project/organization (going forward).
+
+### Advanced source names
 
 Data scrubbing always works on the raw event payload. Keep in mind that some fields in the UI may be called differently in the JSON schema. When looking at an event there should always be a link called "JSON" present that allows you to see what the data scrubber sees.
 
@@ -128,9 +129,9 @@ Since the "error message" is taken from the `exception`'s `value`, and the "mess
 
 ### Boolean Logic
 
-You can combine selectors using boolean logic.
+You can combine sources using boolean logic.
 
-* Prefix with `!` to invert the selector. `foo` matches the JSON key `foo`, while `!foo` matches everything but `foo`.
+* Prefix with `!` to invert the source. `foo` matches the JSON key `foo`, while `!foo` matches everything but `foo`.
 * Build the conjunction (AND) using `&&`, such as: `foo && !extra.foo` to match the key `foo` except when inside of `extra`.
 * Build the disjunction (OR) using `||`, such as: `foo || bar` to match `foo` or `bar`.
 
@@ -143,25 +144,25 @@ You can combine selectors using boolean logic.
 
 Select subsections by JSON-type using the following:
 
-* `$string` matches any string value
-* `$number` matches any integer or float value
-* `$datetime` matches any field in the event that represents a timestamp
-* `$array` matches any JSON array value
-* `$object` matches any JSON object
+* `$string`: Matches any string value
+* `$number`: Matches any integer or float value
+* `$datetime`: Matches any field in the event that represents a timestamp
+* `$array`: Matches any JSON array value
+* `$object`: Matches any JSON object
 
 Select known parts of the schema using the following:
 
-* `$error` matches a single exception instance in `{"exception": {"values": [...]}}`
-* `$stack` matches a stack trace instance
-* `$frame` matches a frame in a stack trace
-* `$http` matches the HTTP request context of an event
-* `$user` matches the user context of an event
-* `$message` matches the top-level log message in `{"logentry": {"formatted": ...}}`
-* `$logentry` matches the `logentry` attribute of an event.
-* `$thread` matches a single thread instance in `{"threads": {"values": [...]}}`
-* `$breadcrumb` matches a single breadcrumb in `{"breadcrumbs": {"values": [...]}}`
-* `$span` matches a [trace span]({% link _documentation/performance/performance-glossary.md %}#span)
-* `$sdk` matches the SDK context in `{"sdk": ...}`
+* `$error`: Matches a single exception instance. Alias for `exception.values.*`
+* `$stack`: Matches a stack trace instance. Alias for `stacktrace || $error.stacktrace || $thread.stacktrace`
+* `$frame`: Matches a frame in a stack trace. Alias for `$stacktrace.frames.*`
+* `$http`: Matches the HTTP request context of an event. Alias for `request`
+* `$user`: Matches the user context of an event. Alias for `user`
+* `$message`: Matches the top-level log message. Alias for `$logentry.formatted`
+* `$logentry`: Matches the `logentry` attribute of an event. Alias for `logentry`
+* `$thread`: Matches a single thread instance. Alias for `threads.values.*`
+* `$breadcrumb`: Matches a single breadcrumb. Alias for `breadcrumbs.values.*`
+* `$span`: Matches a [trace span](/performance-monitoring/distributed-tracing/#traces-transactions-and-spans). Alias for `spans.*`
+* `$sdk`: Matches the SDK context. Alias for `sdk`
 
 ### Escaping Special Characters
 

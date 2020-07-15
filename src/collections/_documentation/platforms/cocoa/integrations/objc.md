@@ -1,7 +1,7 @@
 ```objc
 NSMutableArray *integrations = [SentryOptions defaultIntegrations].mutableCopy;
-[integrations removeObject:@"SentryUIKitMemoryWarningIntegration"];
-[SentrySDK initWithOptions:@{
+[integrations removeObject:@"SentryAutoBreadcrumbTrackingIntegration"];
+[SentrySDK startWithOptions:@{
     // ...
     @"integrations": integrations
     // ...

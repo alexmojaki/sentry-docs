@@ -21,13 +21,13 @@ These integrations are set up once per organization, and are then usable in all 
 -   [_Slack_]({%- link _documentation/workflow/integrations/global-integrations.md -%}#slack)
 -   [_Vercel_]({%- link _documentation/workflow/integrations/global-integrations.md -%}#vercel)
 
-These integrations are maintained and supported by the companies that created them. See [integration platform]({%- link _documentation/workflow/integrations/integration-platform/index.md -%}).
+These integrations are maintained and supported by the companies that created them. See [integration platform](/workflow/integrations/integration-platform/).
 
--   [_Amixr_]({%- link _documentation/workflow/integrations/global-integrations.md -%}#amixr)
--   [_ClickUp_]({%- link _documentation/workflow/integrations/global-integrations.md -%}#clickup)
--   [_Clubhouse_]({%- link _documentation/workflow/integrations/global-integrations.md -%}#clubhouse)
--   [_Rookout_]({%- link _documentation/workflow/integrations/global-integrations.md -%}#rookout)
--   [_Split_]({%- link _documentation/workflow/integrations/global-integrations.md -%}#split)
+-   [_Amixr_](/workflow/integrations/global-integrations/#amixr)
+-   [_ClickUp_](/workflow/integrations/global-integrations/#clickup)
+-   [_Clubhouse_](/workflow/integrations/global-integrations/#clubhouse)
+-   [_Rookout_](/workflow/integrations/global-integrations/#rookout)
+-   [_Split_](/workflow/integrations/global-integrations/#split)
 
 ### Per-Project Integrations
 
@@ -39,13 +39,13 @@ These integrations are set up once per project, and are only usable in projects 
   level="info"
 %}
 
--   [_Amazon SQS_]({%- link _documentation/data-management/data-forwarding.md -%})
--   [_Asana_]({%- link _documentation/workflow/integrations/legacy-integrations.md -%}#asana)
+-   [_Amazon SQS_](/data-management/data-forwarding/)
+-   [_Asana_](/workflow/integrations/legacy-integrations/#asana)
 -   Campfire*
 -   Flowdock
--   [_GitLab_]({%- link _documentation/workflow/integrations/global-integrations.md -%}#gitlab)
--   [_Heroku_]({%- link _documentation/workflow/integrations/legacy-integrations.md -%}#heroku)
--   [_HipChat_]({%- link _documentation/workflow/integrations/legacy-integrations.md -%}#hipchat)
+-   [_GitLab_](/workflow/integrations/global-integrations/#gitlab)
+-   [_Heroku_](/workflow/integrations/legacy-integrations/#heroku)
+-   [_HipChat_](/workflow/integrations/legacy-integrations/#hipchat)
 -   Lighthouse*
 -   OpsGenie
 -   PagerDuty
@@ -53,7 +53,7 @@ These integrations are set up once per project, and are only usable in projects 
 -   Pivotal Tracker
 -   Pushover
 -   Redmine
--   [_Splunk_]({%- link _documentation/workflow/integrations/legacy-integrations.md -%}#splunk)
+-   [_Splunk_](/workflow/integrations/legacy-integrations/#splunk)
 -   Taiga
 -   Teamwork
 -   Trello*
@@ -62,4 +62,4 @@ These integrations are set up once per project, and are only usable in projects 
 
 ### Integration Platform
 
-Sentry’s [Integration Platform]({%- link _documentation/workflow/integrations/integration-platform/index.md -%}) provides a way for external services to interact with the Sentry SaaS service using the REST API and webhooks. Integrations utilizing this platform are first-class actors within Sentry, and you can build them for [public]({%- link _documentation/workflow/integrations/integration-platform/index.md -%}#public-integrations) as well as [internal]({%- link _documentation/workflow/integrations/integration-platform/index.md -%}#internal-integrations) use cases.
+Sentry’s [Integration Platform](/workflow/integrations/integration-platform/) provides a way for external services to interact with the Sentry SaaS service using the REST API and webhooks. Integrations utilizing this platform are first-class actors within Sentry, and you can build them for [public](/workflow/integrations/integration-platform/#public-integrations) as well as [internal](/workflow/integrations/integration-platform/#internal-integrations) use cases.
